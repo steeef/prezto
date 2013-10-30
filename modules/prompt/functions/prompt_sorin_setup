@@ -14,7 +14,8 @@
 pmodload 'helper'
 
 function hg_prompt_info {
-  _hg_prompt_info=$(hg prompt --angle-brackets "%B%F{135}☿%f%b:%F{166}<branch>%f<status>" 2>/dev/null)
+  _hg_prompt_info=$(hg prompt --angle-brackets "%B%F{135}☿%f%b:%F{166}<branch>\
+%f%B%F{red}<status><update>%f%b" 2>/dev/null)
 }
 
 
