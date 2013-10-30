@@ -15,7 +15,7 @@ pmodload 'helper'
 
 function hg_prompt_info {
   _hg_prompt_info=$(hg prompt --angle-brackets "%B%F{135}☿%f%b:%F{166}<branch>\
-%f%B%F{red}<status><update>%f%b" 2>/dev/null)
+%f%B%F{red}<status|modified|unknown><update>%f%b" 2>/dev/null)
 }
 
 
@@ -87,8 +87,8 @@ function prompt_sorin_setup {
     'rprompt' '%A%B%S%a%d%m%r%U%u'
 
   # Define prompts.
-  PROMPT='%F{magenta}${_prompt_sorin_pwd}%f${_hg_prompt_info}${git_info:+${(e)git_info[prompt]}}%(!. %B%F{red}#%f%b.)${editor_info[keymap]} '
-  RPROMPT='${editor_info[overwrite]}%(?:: %F{red}⏎%f)${VIM:+" %B%F{green}V%f%b"}${git_info[rprompt]}'
+  PROMPT='%F{magenta}${_prompt_sorin_pwd}%f${_hg_prompt_info}${git_info:+${(e)git_info[prompt]}}${git_info[rprompt]}%(!. %B%F{red}#%f%b.)${editor_info[keymap]} '
+  RPROMPT='${editor_info[overwrite]}%(?:: %F{red}⏎%f)${VIM:+" %B%F{green}V%f%b"}'
   SPROMPT='zsh: correct %F{red}%R%f to %F{green}%r%f [nyae]? '
 }
 
