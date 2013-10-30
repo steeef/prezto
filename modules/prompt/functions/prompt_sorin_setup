@@ -13,6 +13,11 @@
 # Load dependencies.
 pmodload 'helper'
 
+function hg_prompt_info {
+  _hg_prompt_info=$(hg prompt --angle-brackets "%B%F{135}☿%f%b:%F{166}<branch>%f<status>" 2>/dev/null)
+}
+
+
 function prompt_sorin_pwd {
   local pwd="${PWD/#$HOME/~}"
 
@@ -25,6 +30,7 @@ function prompt_sorin_pwd {
 }
 
 function prompt_sorin_precmd {
+  unset _hg_prompt_info
   setopt LOCAL_OPTIONS
   unsetopt XTRACE KSH_ARRAYS
 
@@ -33,8 +39,14 @@ function prompt_sorin_precmd {
 
   # Get Git repository information.
   if (( $+functions[git-info] )); then
-    git-info
+    if ! git-info; then
+      # might be a mercurial repo
+      if hg branch >/dev/null 2>&1; then
+        hg_prompt_info
+      fi
+    fi
   fi
+
 }
 
 function prompt_sorin_setup {
@@ -44,16 +56,15 @@ function prompt_sorin_setup {
 
   # Load required functions.
   autoload -Uz add-zsh-hook
-  autoload -Uz vcs_info
 
   # Add hook for calling git-info before each command.
   add-zsh-hook precmd prompt_sorin_precmd
 
   # Set editor-info parameters.
   zstyle ':prezto:module:editor:info:completing' format '%B%F{red}...%f%b'
-  zstyle ':prezto:module:editor:info:keymap:primary' format ' %B%F{green}❯%f%b'
+  zstyle ':prezto:module:editor:info:keymap:primary' format ' %B%F{red}❯%F{yellow}❯%F{green}❯%f%b'
   zstyle ':prezto:module:editor:info:keymap:primary:overwrite' format ' %F{red}♺%f'
-  zstyle ':prezto:module:editor:info:keymap:alternate' format ' %B%F{green}❮%f%b'
+  zstyle ':prezto:module:editor:info:keymap:alternate' format ' %B%F{green}❮%F{yellow}❮%F{red}❮%f%b'
 
   # Set git-info parameters.
   zstyle ':prezto:module:git:info' verbose 'yes'
@@ -75,7 +86,7 @@ function prompt_sorin_setup {
     'rprompt' '%A%B%S%a%d%m%r%U%u'
 
   # Define prompts.
-  PROMPT='%F{magenta}${_prompt_sorin_pwd}%f${git_info:+${(e)git_info[prompt]}}%(!. %B%F{red}#%f%b.)${editor_info[keymap]} '
+  PROMPT='%F{magenta}${_prompt_sorin_pwd}%f${_hg_prompt_info}${git_info:+${(e)git_info[prompt]}}%(!. %B%F{red}#%f%b.)${editor_info[keymap]} '
   RPROMPT='${editor_info[overwrite]}%(?:: %F{red}⏎%f)${VIM:+" %B%F{green}V%f%b"}${git_info[rprompt]}'
   SPROMPT='zsh: correct %F{red}%R%f to %F{green}%r%f [nyae]? '
 }
